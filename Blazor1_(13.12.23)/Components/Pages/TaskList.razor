@@ -1,0 +1,82 @@
+﻿@page "/tasklist"
+@rendermode InteractiveServer
+
+<h3>Список задач</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+            <th>Дата создания</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var task in tasks)
+        {
+            <tr>
+                <td>@task.Title</td>
+                <td>@task.Description</td>
+                <td>@task.CreateDate.ToString("dd.MM.yyyy")</td>
+                <td> <button class="btn-danger" @onclick="() => DeleteTask(task.Id)">Удалить</button> </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Создать новую задачу</h3>
+
+<div class="form-group">
+    <label for="title">Название: </label>
+    <input id="title" class="form-control" @bind="@newTaskTitle" />
+</div>
+
+<div class="form-group">
+    <label for="description">Описание: </label>
+    <input id="description" class="form-control" @bind="@newTaskDescription"/>
+</div>
+
+<button class="btn-primary" @onclick="CreateTask">Создать</button>
+
+@code
+{
+    List<TaskItem> tasks = new List<TaskItem>()
+    {
+        new TaskItem {Id = 1, Title = "Помыть посуду", Description = "Помыть всю посуду", CreateDate = DateTime.Now},
+        new TaskItem {Id = 2, Title = "Погладить одежду", Description = "Погладить всю одежду", CreateDate = DateTime.Now.AddDays(-1)},
+        new TaskItem {Id = 3, Title = "Позаниматься программированием", Description = "Попрограммировать в Blazor с Игорем Владимировичем в академии TOP", CreateDate = DateTime.Now.AddDays(-2)}
+    };
+
+    string newTaskTitle = "";
+    string newTaskDescription = "";
+
+    void DeleteTask(int taskId)
+    {
+        var task = tasks.FirstOrDefault(t => t.Id == taskId);
+        if(task != null)
+        {
+            tasks.Remove(task);
+        }
+    }
+
+    void CreateTask()
+    {
+        if (!string.IsNullOrEmpty(newTaskTitle))
+        {
+            var newTask = new TaskItem
+                {
+                    Id = tasks.Count + 1,
+                    Title = newTaskTitle,
+                    Description = newTaskDescription,
+                    CreateDate = DateTime.Now
+                };
+
+            tasks.Add(newTask);
+
+            newTaskTitle = "";
+            newTaskDescription = "";
+        }
+    }
+}
